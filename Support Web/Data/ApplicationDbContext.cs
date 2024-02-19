@@ -10,6 +10,8 @@ namespace Support_Web.Data
 
 		}
 
-		DbSet<Product> Products { get; set; }
+		public DbSet<Product> Products { get; set; }
+
+		public DbSet<Blog> Blogs { get; set; }
 	}
 }

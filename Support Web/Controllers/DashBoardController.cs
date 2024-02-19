@@ -1,75 +1,67 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Support_Web.Data;
 using Support_Web.Models;
+
+#pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type.
+
+
 
 namespace Support_Web.Controllers
 {
     public class DashBoardController : Controller
     {
-        private static List<Product> _products = new List<Product>();
+        ApplicationDbContext _context;
+
+        public DashBoardController(ApplicationDbContext context)
+        {
+            _context = context;
+        }
+
         public IActionResult Index()
         {
             return View();
         }
 
-		public IActionResult AddProduct()
-		{
-			return View();
-		}
+
+
+        #region Add Product
+
+        public IActionResult AddProduct()
+        {
+            return View();
+        }
 
         [HttpPost]
         public IActionResult AddProduct(Product product)
         {
-            if(_products.Count == 0)
-			{
-                product.Id = 1;
-			}
-			else
-			{
-                product.Id = _products.Max(x => x.Id) + 1;
-			}
+            _context.Products.Add(product);
+            _context.SaveChanges();
 
-            _products.Add(product);
-
-            return RedirectToAction("Index");
+            return RedirectToAction("ViewProducts");
         }
-
-        #region GetAll
-
-        public IActionResult GetAllData()
-		{
-            return View(_products);
-		}
 
         #endregion
 
-        #region Delete
-        public IActionResult Delete(int id)
-		{
-            Product x = _products.FirstOrDefault(x => x.Id == id);
-            _products.Remove(x);
+        #region View Products
 
-            return RedirectToAction("GetAllData");
+        public IActionResult ViewProducts()
+        {
+            return View(_context.Products.ToList());
         }
+
         #endregion
 
-        #region Edit
-        public IActionResult Edit(int id)
-		{
-            Product x = _products.SingleOrDefault(x => x.Id == id);
-
-            //x.Name = product.Name;
-            //x.Description = product.Description;
-            //x.Price = product.Price;
-            //x.Quantity = product.Quantity;
-            //x.Company = product.Company;
-
-            return View(x);
-		}
+        #region Edit Product
+        public IActionResult EditProduct(int id)
+        {
+			Product x = _context.Products.SingleOrDefault(x => x.Id == id);
+			return View(x);
+        }
 
         [HttpPost]
-        public IActionResult Edit(Product product)
-		{
-            Product x = _products.SingleOrDefault(x => x.Id == product.Id);
+        public IActionResult EditProduct(Product product)
+        {
+            Product x = _context.Products.SingleOrDefault(x => x.Id == product.Id);
 
             x.Name = product.Name;
             x.Description = product.Description;
@@ -78,8 +70,84 @@ namespace Support_Web.Controllers
             x.Quantity = product.Quantity;
             x.Company = product.Company;
 
-            return RedirectToAction("GetAllData");
-		}
+            _context.SaveChanges();
+
+            return RedirectToAction("ViewProducts");
+        }
+        #endregion
+
+        #region Delete Product
+        public IActionResult DeleteProduct(int id)
+        {
+            Product x = _context.Products.FirstOrDefault(x => x.Id == id);
+            _context.Products.Remove(x);
+            _context.SaveChanges();
+
+            return RedirectToAction("ViewProducts");
+        }
+        #endregion
+
+
+
+
+        #region Add Blog
+
+        public IActionResult AddBlog()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult AddBlog(Blog blog)
+        {
+            _context.Blogs.Add(blog);
+            _context.SaveChanges();
+
+            return RedirectToAction("Index");
+        }
+
+        #endregion
+
+        #region View Blogs
+
+        public IActionResult Viewblogs()
+        {
+            return View(_context.Blogs.ToList());
+        }
+
+        #endregion
+
+        #region Edit Blog
+
+        public IActionResult EditBlog(int id)
+        {
+            Blog x = _context.Blogs.SingleOrDefault(x => x.Id == id);
+            return View(x);
+        }
+
+        [HttpPost]
+        public IActionResult EditBlog(Product product)
+        {
+            Blog x = _context.Blogs.SingleOrDefault(x => x.Id == product.Id);
+
+            x.Name = product.Name;
+            _context.SaveChanges();
+
+            return RedirectToAction("ViewBlogs");
+        }
+        #endregion
+
+        #region Delete Blog
+
+        public IActionResult DeleteBlog(int id)
+        {
+            Blog x = _context.Blogs.SingleOrDefault(x => x.Id == id);
+            _context.Blogs.Remove(x);
+            _context.SaveChanges();
+
+            return RedirectToAction("ViewBlogs");
+        }
+
         #endregion
     }
 }

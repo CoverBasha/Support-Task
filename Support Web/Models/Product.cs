@@ -11,5 +11,10 @@
         public Company Company { get; set; }
 
 
+		public Product()
+		{
+            Company = new Company();
+		}
+
     }
 }
